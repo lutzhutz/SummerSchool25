@@ -1,0 +1,17 @@
+The application of statistical data analysis is becoming increasingly
+important across all research fields, driven by greater data availability
+and accessible programming languages, such as Python. However, many
+researchers do not adequately verify and discuss essential data assumptions,
+leading to potentially incorrect results. This thesis introduces a practical,
+assumption-focused guide on the e↵ective application of statistical methods,
+with an emphasis on the often-overlooked step of verifying data assumptions.
+Unlike traditional guides that focus soley on the technical implementation
+of statistical methods, this work addresses the consequences of assumption
+violations and o↵ers alternative approaches to ensure that findings remain
+valid and interpretable, even when ideal conditions are not met. For each
+method, the guide discusses these consequences and outlines techniques for
+checking and satisfying its assumptions. To enhance applicability, the thesis
+includes a case study with a real-world dataset from a European labour union,
+demonstrating how this guide can contribute to a reliable churn analysis.
+This work encourages a more conscientious approach to data analysis, thereby
+improving the quality of research outcomes.

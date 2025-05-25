@@ -37,24 +37,35 @@
       background: var(--color-primary);
       color: white;
       padding: 2rem 1rem;
-      text-align: center;
     }
 
-    .site-header .logo {
-      height: 60px;
-      margin-bottom: 0.5rem;
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0;
     }
 
     .site-header .logo {
       height: 80px;
-      max-width: 100%;
-      margin-bottom: 0.75rem;
+      width: 80px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .tagline {
+      text-align: center;
       font-style: italic;
       font-size: 1rem;
       color: #e3e3e3;
+      margin-top: 1rem;
     }
 
     .prompt-form {
@@ -83,7 +94,7 @@
     }
 
     textarea {
-      resize: vertical; /* Only resizable vertically */
+      resize: vertical;
       max-height: 300px;
     }
 
@@ -100,9 +111,8 @@
     }
 
     #focusSelect {
-      margin-bottom: 1.5rem; /* Add more space below dropdown */
+      margin-bottom: 1.5rem;
     }
-
 
     .btn {
       display: inline-block;
@@ -142,8 +152,10 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <img src="hu_logo.png" alt="Humboldt Universität zu Berlin Logo" class="logo" />
-      <h1>Summer School 2025</h1>
+      <div class="header-row">
+        <h1 class="header-title">Summer School 2025</h1>
+        <img src="hu_logo.png" alt="Humboldt Universität zu Berlin Logo" class="logo" />
+      </div>
       <p class="tagline">Expand your horizons at HU this summer</p>
     </div>
   </header>
@@ -168,14 +180,14 @@
 
         <label for="focusSelect">Focus</label>
         <select id="focusSelect">
-          <option value="theory">Theory</option>
-          <option value="applications">Applications</option>
-          <option value="interdisciplinary">Interdisciplinary</option>
+          <option value="research gap">What was the research gap?</option>
+          <option value="method">Main methodology</option>
+          <option value="key results">What are the key results?</option>
+          <option value="purpose">Why do the findings matter?</option>
         </select>
 
         <button type="submit" class="btn">Send</button>
       </form>
-
 
       <div id="response" class="response" aria-live="polite"></div>
     </section>
@@ -212,6 +224,10 @@
       responseDiv.textContent = isLoading ? 'Loading…' : '';
     }
 
+    function setTokenLength(complexity) {
+      return 500;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const abstract = userInput.value.trim();
@@ -223,7 +239,33 @@
       const nerdiness = nerdinessSlider.value;
       const focus = focusSelect.value;
 
-      const systemMsg = 'Rewrite and summarize academic content based on input conditions.';
+      const systemMsg = 'You are a helpful assistant in helping to understand papers. ' +
+                        'You will recive the abstract of the paper and conditions for the answer that ' +
+                        'are defined below.' +
+                        'Conditions: ' +
+                        `- Focus: ${focus}` +
+                        `- Complexity: ${complexity}%` +
+                        `- Nerdiness: ${nerdiness}%` +
+                        '' +
+                        'The focus condition is defined as follows: ' +
+                        '- If the focus is "research gap", explain what was previously unknown and how the study aims to address that gap. ' +
+                        '- If the focus is "method", describe the main method used in the study. ' +
+                        '- If the focus is "key results", summarize the main findings as clearly and precisely as possible. ' +
+                        '- If the focus is "purpose", explain what the findings suggest and why they might be important.' +
+                        '' +
+                        'The complexity condition is defined as follows: ' +
+                        '- If the complexity is 0%, explain the topic using very simple language and concrete, sensory examples. Use relatable analogies and clear cause-effect reasoning. Avoid any technical terminology or abstract concepts. Assume you are speaking to a young child. ' +
+                        '- If the complexity is 25%, use simplified models and basic scientific vocabulary to explain the topic. Introduce some abstraction, but keep concepts clear and structured. Use familiar examples and everyday analogies to support understanding. ' +
+                        '- If the complexity is 50%, provide a moderately detailed explanation using foundational knowledge from one or more disciplines. Use structured arguments and moderate technical vocabulary. Make interdisciplinary connections where helpful. ' +
+                        '- If the complexity is 75%, give a detailed explanation using advanced theoretical reasoning and appropriate technical terminology. Assume the reader has a graduate-level background. Be precise, rigorous, and include exceptions or caveats where relevant. ' +
+                        '- If the complexity is 100%, deliver a highly sophisticated explanation using expert-level language and deep theoretical abstraction. Integrate insights across domains. Assume you are speaking to a Nobel Prize-level expert. Emphasize intellectual rigor, nuance, and depth.' +
+                        '' + 
+                        'The nerdiness condition is defined as follows: ' +
+                        '- If the nerdiness is above 0%, answer like Tony Stark would explain it to a friend. Use casual marvel style language wutg pop metaphores and jokes. Keep the content intact but fun.' +
+                        '- If the nerdiness is above 30%, additionally hide place names and quotes of Lord of the Rings in the answer.' +
+                        '- If the nerdiness is above 70%, additionally lead the answer so that it concludes with the statement "Do or do not. There is no try!"' +
+                        '' +
+                        'Do not integrate the values of the conditions into your answer!';
 
       const userPrompt = `Rewrite and summarize the following research abstract with ${complexity}% complexity, ${nerdiness}% nerdiness, and a focus on ${focus}:\n\n${abstract}`;
 
@@ -237,7 +279,7 @@
               { role: 'system', content: systemMsg },
               { role: 'user', content: userPrompt }
             ],
-            max_tokens: 300
+            max_tokens: setTokenLength(complexity),
           })
         });
 
