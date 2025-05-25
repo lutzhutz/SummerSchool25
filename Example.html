@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Humboldt Uni Summer School 2025</title>
+  <style>
+    :root {
+      --color-primary: #00467f;
+      --color-primary-hover: #00325d;
+      --color-background: #f4f4f9;
+      --color-surface: #ffffff;
+      --color-text: #212529;
+      --color-muted: #6c757d;
+      --radius: 0.5rem;
+      --spacing: 1.25rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--color-background);
+      color: var(--color-text);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: var(--spacing);
+    }
+
+    .site-header {
+      background: var(--color-primary);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .site-header .logo {
+      height: 60px;
+      margin-bottom: 0.5rem;
+    }
+
+    .site-header .logo {
+      height: 80px;
+      max-width: 100%;
+      margin-bottom: 0.75rem;
+    }
+
+    .tagline {
+      font-style: italic;
+      font-size: 1rem;
+      color: #e3e3e3;
+    }
+
+    .prompt-form {
+      background: white;
+      padding: var(--spacing);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      margin-top: var(--spacing);
+    }
+
+    .prompt-form label {
+      font-weight: 600;
+      display: block;
+      margin: 0.5rem 0 0.25rem;
+    }
+
+    textarea,
+    select,
+    input[type="range"] {
+      width: 100%;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+    }
+
+    textarea {
+      resize: vertical; /* Only resizable vertically */
+      max-height: 300px;
+    }
+
+    .slider-container {
+      margin-bottom: 1rem;
+    }
+
+    .slider-value {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--color-muted);
+      margin-top: -0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    #focusSelect {
+      margin-bottom: 1.5rem; /* Add more space below dropdown */
+    }
+
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      background-color: var(--color-primary);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn:hover {
+      background-color: var(--color-primary-hover);
+    }
+
+    .response {
+      padding: var(--spacing);
+      background: #f1f3f5;
+      border-radius: var(--radius);
+      margin-top: var(--spacing);
+      min-height: 5rem;
+      white-space: pre-wrap;
+    }
+
+    .site-footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--color-muted);
+      padding: 2rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <img src="hu_logo.png" alt="Humboldt Universität zu Berlin Logo" class="logo" />
+      <h1>Summer School 2025</h1>
+      <p class="tagline">Expand your horizons at HU this summer</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section>
+      <form id="promptForm" class="prompt-form">
+        <label for="userInput">Abstract</label>
+        <textarea id="userInput" placeholder="Paste the abstract here..." rows="6" required></textarea>
+
+        <div class="slider-container">
+          <label for="complexitySlider">Complexity</label>
+          <div class="slider-value">Value: <span id="complexityValue">50</span>%</div>
+          <input type="range" id="complexitySlider" min="0" max="100" value="50" />
+        </div>
+
+        <div class="slider-container">
+          <label for="nerdinessSlider">Nerdiness</label>
+          <div class="slider-value">Value: <span id="nerdinessValue">50</span>%</div>
+          <input type="range" id="nerdinessSlider" min="0" max="100" value="50" />
+        </div>
+
+        <label for="focusSelect">Focus</label>
+        <select id="focusSelect">
+          <option value="theory">Theory</option>
+          <option value="applications">Applications</option>
+          <option value="interdisciplinary">Interdisciplinary</option>
+        </select>
+
+        <button type="submit" class="btn">Send</button>
+      </form>
+
+
+      <div id="response" class="response" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2025 Humboldt-Universität zu Berlin</p>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'http://localhost:1234/v1/chat/completions';
+
+    const form = document.getElementById('promptForm');
+    const userInput = document.getElementById('userInput');
+    const responseDiv = document.getElementById('response');
+    const complexitySlider = document.getElementById('complexitySlider');
+    const nerdinessSlider = document.getElementById('nerdinessSlider');
+    const focusSelect = document.getElementById('focusSelect');
+
+    const complexityValue = document.getElementById('complexityValue');
+    const nerdinessValue = document.getElementById('nerdinessValue');
+
+    complexitySlider.addEventListener('input', () => {
+      complexityValue.textContent = complexitySlider.value;
+    });
+
+    nerdinessSlider.addEventListener('input', () => {
+      nerdinessValue.textContent = nerdinessSlider.value;
+    });
+
+    function setLoading(isLoading) {
+      responseDiv.textContent = isLoading ? 'Loading…' : '';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const abstract = userInput.value.trim();
+      if (!abstract) return;
+
+      setLoading(true);
+
+      const complexity = complexitySlider.value;
+      const nerdiness = nerdinessSlider.value;
+      const focus = focusSelect.value;
+
+      const systemMsg = 'Rewrite and summarize academic content based on input conditions.';
+
+      const userPrompt = `Rewrite and summarize the following research abstract with ${complexity}% complexity, ${nerdiness}% nerdiness, and a focus on ${focus}:\n\n${abstract}`;
+
+      try {
+        const res = await fetch(API_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'llama-3.2-3b-instruct',
+            messages: [
+              { role: 'system', content: systemMsg },
+              { role: 'user', content: userPrompt }
+            ],
+            max_tokens: 300
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error(`Server returned ${res.status}`);
+        }
+
+        const { choices } = await res.json();
+        const text = choices?.[0]?.message?.content?.trim() ?? 'No response.';
+        responseDiv.textContent = text;
+      } catch (err) {
+        responseDiv.textContent = `Error: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
